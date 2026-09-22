@@ -16,6 +16,15 @@
                 <a class="nav-link text-white" href="{{ url('/classes') }}">Classes</a>
                 <a class="nav-link text-white" href="{{ url('/eleves') }}">Élèves</a>
             </div>
+            <div class="d-flex align-items-center">
+                @auth
+                    <span class="text-white me-3">{{ auth()->user()->name }}</span>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-outline-light">Déconnexion</button>
+                    </form>
+                @endauth
+            </div>
         </div>
     </nav>
 
