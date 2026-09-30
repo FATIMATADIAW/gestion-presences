@@ -32,6 +32,23 @@ class ClasseController extends Controller
         return redirect()->route('classes.index')->with('success', 'Classe créée avec succès.');
     }
 
+    public function edit(Classe $classe): View
+    {
+        return view('classes.modifier', ['classe' => $classe]);
+    }
+
+    public function update(Request $request, Classe $classe): RedirectResponse
+    {
+        $data = $request->validate([
+            'nom' => 'required|string|max:255',
+            'niveau' => 'nullable|string|max:255',
+        ]);
+
+        $classe->update($data);
+
+        return redirect()->route('classes.index')->with('success', 'Classe modifiée.');
+    }
+
     public function destroy(Classe $classe): RedirectResponse
     {
         $classe->delete();

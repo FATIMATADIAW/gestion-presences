@@ -3,7 +3,7 @@
 @section('content')
 <div class="container mt-4">
 
-    <a href="{{ route('eleves.index') }}">← Retour à la liste des élèves</a>
+   <a href="{{ route('eleves.index') }}" class="back-link">← Retour à la liste des élèves</a>
 
     <h1 class="mt-3 mb-4">Nouvel élève</h1>
 

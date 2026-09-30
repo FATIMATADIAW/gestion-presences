@@ -1,46 +1,55 @@
 @extends('layouts.app')
 
+@section('title', 'Élèves')
+
 @section('content')
-<div class="container mt-4">
+    <div class="page-header">
+        <h1 class="page-title"><span class="bar"></span> Liste des élèves</h1>
+        <a class="btn-add" href="{{ route('eleves.create') }}">
+            <i class="bi bi-plus-lg"></i> Nouvel élève
+        </a>
+    </div>
 
-    <h1 class="mb-3">Liste des élèves</h1>
-
-    <a href="{{ route('eleves.create') }}" class="btn btn-primary mb-3">+ Nouvel élève</a>
-
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Prénom</th>
-                <th>Matricule</th>
-                <th>Classe</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($eleves as $eleve)
-            <tr>
-                <td>{{ $eleve->nom }}</td>
-                <td>{{ $eleve->prenom }}</td>
-                <td>{{ $eleve->matricule }}</td>
-                <td>{{ $eleve->classe->nom ?? '—' }}</td>
-                <td>
-                    <form action="{{ route('eleves.destroy', $eleve) }}" method="POST"
-                          onsubmit="return confirm('Supprimer cet élève ?');" style="display:inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
-                    </form>
-                </td>
-            </tr>
-            @empty
-            <tr><td colspan="5">Aucun élève pour le moment.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Matricule</th>
+                        <th>Classe</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($eleves as $eleve)
+                        <tr>
+                            <td>{{ $eleve->nom }}</td>
+                            <td>{{ $eleve->prenom }}</td>
+                            <td>{{ $eleve->matricule ?? '—' }}</td>
+                            <td><span class="badge-classe">{{ $eleve->classe->nom ?? '—' }}</span></td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    <a class="btn btn-outline-secondary btn-sm" href="{{ route('eleves.edit', $eleve) }}">
+                                        <i class="bi bi-pencil"></i> Modifier
+                                    </a>
+                                    <form action="{{ route('eleves.destroy', $eleve) }}" method="POST"
+                                          onsubmit="return confirm('Supprimer cet élève ?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-supprimer btn-sm text-white">
+                                            <i class="bi bi-trash"></i> Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="5" class="text-center text-muted py-4">Aucun élève pour le moment.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 @endsection

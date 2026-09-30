@@ -1,49 +1,58 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Nouvelle séance - ScolPrésence</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 500px; margin: 40px auto; }
-        label { display: block; margin-top: 15px; font-weight: bold; }
-        input, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
-        button { background: #16a34a; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-top: 20px; }
-        a.retour { display: inline-block; margin-bottom: 15px; color: #2563eb; text-decoration: none; }
-        .erreur { color: #dc2626; font-size: 14px; margin-top: 5px; }
-    </style>
-</head>
-<body>
-    <a class="retour" href="{{ route('presences.index') }}">&larr; Retour à la liste des séances</a>
+@extends('layouts.app')
 
-    <h1>Nouvelle séance</h1>
+@section('title', 'Nouvelle séance')
 
-    <form action="{{ route('presences.creerEnregistrer') }}" method="POST">
-        @csrf
+@section('content')
+    <a class="back-link" href="{{ route('presences.index') }}">&larr; Retour à la liste des séances</a>
 
-        <label>Date</label>
-        <input type="date" name="date" value="{{ old('date') }}">
-        @error('date') <div class="erreur">{{ $message }}</div> @enderror
+    <div class="page-header">
+        <h1 class="page-title"><span class="bar"></span> Nouvelle séance</h1>
+    </div>
 
-        <label>Heure</label>
-        <input type="time" name="heure" value="{{ old('heure') }}">
-        @error('heure') <div class="erreur">{{ $message }}</div> @enderror
+    <div class="form-card mt-3">
+        <form action="{{ route('presences.creerEnregistrer') }}" method="POST">
+            @csrf
 
-        <label>Matière</label>
-        <input type="text" name="matiere" value="{{ old('matiere') }}" placeholder="Ex : Français">
-        @error('matiere') <div class="erreur">{{ $message }}</div> @enderror
+            <div class="mb-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" id="date" name="date" value="{{ old('date') }}"
+                       class="form-control @error('date') is-invalid @enderror">
+                @error('date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
 
-        <label>Classe</label>
-        <select name="classe_id">
-            <option value="">-- Choisir une classe --</option>
-            @foreach($classes as $classe)
-                <option value="{{ $classe->id }}" {{ old('classe_id') == $classe->id ? 'selected' : '' }}>
-                    {{ $classe->nom }}
-                </option>
-            @endforeach
-        </select>
-        @error('classe_id') <div class="erreur">{{ $message }}</div> @enderror
+            <div class="mb-3">
+                <label for="heure" class="form-label">Heure</label>
+                <input type="time" id="heure" name="heure" value="{{ old('heure') }}"
+                       class="form-control @error('heure') is-invalid @enderror">
+                @error('heure') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
 
-        <button type="submit">Créer la séance</button>
-    </form>
-</body>
-</html>
+            <div class="mb-3">
+                <label for="matiere" class="form-label">Matière</label>
+                <input type="text" id="matiere" name="matiere" value="{{ old('matiere') }}"
+                       placeholder="Ex : Français"
+                       class="form-control @error('matiere') is-invalid @enderror">
+                @error('matiere') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="mb-3">
+                <label for="classe_id" class="form-label">Classe</label>
+                <select id="classe_id" name="classe_id"
+                        class="form-select @error('classe_id') is-invalid @enderror">
+                    <option value="">-- Choisir une classe --</option>
+                    @foreach($classes as $classe)
+                        <option value="{{ $classe->id }}" {{ old('classe_id') == $classe->id ? 'selected' : '' }}>
+                            {{ $classe->nom }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('classe_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-add">Créer la séance</button>
+                <a class="btn-cancel" href="{{ route('presences.index') }}">Annuler</a>
+            </div>
+        </form>
+    </div>
+@endsection

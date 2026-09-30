@@ -3,77 +3,68 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classe;
-use App\Models\Eleve;
 use App\Models\Presence;
-use Illuminate\View\View;
+use Illuminate\Http\Request;
 
 class StatsController extends Controller
 {
-    public function index(): View
+    public function index(Request $request)
     {
-        // --- Chiffres globaux ---
-        $totalPresences = Presence::count();
-        $totalPresent = Presence::where('statut', 'present')->count();
-        $totalAbsent = Presence::where('statut', 'absent')->count();
-        $totalRetard = Presence::where('statut', 'retard')->count();
+        $classeId = $request->query('classe_id');
+        $du = $request->query('du');
+        $au = $request->query('au');
 
-        $tauxAbsenteisme = $totalPresences > 0
-            ? round(($totalAbsent / $totalPresences) * 100, 1)
-            : 0;
+        $base = Presence::query()
+            ->join('seances', 'presences.seance_id', '=', 'seances.id')
+            ->join('eleves', 'presences.eleve_id', '=', 'eleves.id')
+            ->when($classeId, fn ($q) => $q->where('seances.classe_id', $classeId))
+            ->when($du, fn ($q) => $q->whereDate('seances.date', '>=', $du))
+            ->when($au, fn ($q) => $q->whereDate('seances.date', '<=', $au));
 
-        $tauxPresence = $totalPresences > 0
-            ? round(($totalPresent / $totalPresences) * 100, 1)
-            : 0;
+        $c = (clone $base)->selectRaw("
+            COUNT(*) as total,
+            SUM(presences.statut = 'present') as presents,
+            SUM(presences.statut = 'absent') as absents,
+            SUM(presences.statut = 'retard') as retards
+        ")->first();
 
-        // --- Taux d'absentéisme par classe ---
-        $classes = Classe::with('eleves.presences')->get()->map(function ($classe) {
-            $totalPointages = 0;
-            $totalAbsences = 0;
+        $total   = (int) $c->total;
+        $presents = (int) $c->presents;
+        $absents  = (int) $c->absents;
+        $retards  = (int) $c->retards;
 
-            foreach ($classe->eleves as $eleve) {
-                foreach ($eleve->presences as $presence) {
-                    $totalPointages++;
-                    if ($presence->statut === 'absent') {
-                        $totalAbsences++;
-                    }
-                }
-            }
+        $tauxPresence = $total ? round(($presents + $retards) / $total * 100) : 0;
+        $tauxAbsence  = $total ? round($absents / $total * 100) : 0;
 
-            $taux = $totalPointages > 0 ? round(($totalAbsences / $totalPointages) * 100, 1) : 0;
+        $parClasse = (clone $base)
+            ->join('classes', 'seances.classe_id', '=', 'classes.id')
+            ->selectRaw("classes.nom as nom, COUNT(*) as total,
+                SUM(presences.statut = 'absent') as absents,
+                SUM(presences.statut = 'retard') as retards")
+            ->groupBy('classes.id', 'classes.nom')
+            ->get()
+            ->map(function ($r) {
+                $r->taux_absence = $r->total ? round($r->absents / $r->total * 100) : 0;
+                $r->taux_presence = 100 - $r->taux_absence;
+                return $r;
+            });
 
-            return [
-                'nom' => $classe->nom,
-                'total_pointages' => $totalPointages,
-                'total_absences' => $totalAbsences,
-                'taux_absenteisme' => $taux,
-            ];
-        });
+        $topAbsents = (clone $base)
+            ->join('classes', 'eleves.classe_id', '=', 'classes.id')
+            ->where('presences.statut', 'absent')
+            ->selectRaw('eleves.nom, eleves.prenom, classes.nom as classe, COUNT(*) as absences')
+            ->groupBy('eleves.id', 'eleves.nom', 'eleves.prenom', 'classes.nom')
+            ->orderByDesc('absences')
+            ->limit(5)
+            ->get();
 
-        // --- Top 5 élèves les plus absents ---
-        $elevesAbsences = Eleve::with('classe')->get()->map(function ($eleve) {
-            $absences = $eleve->presences()->where('statut', 'absent')->count();
-            $totalPointages = $eleve->presences()->count();
+        $classes = Classe::orderBy('nom')->get();
 
-            return [
-                'nom_complet' => $eleve->nom_complet,
-                'classe' => $eleve->classe->nom ?? '—',
-                'absences' => $absences,
-                'total_pointages' => $totalPointages,
-            ];
-        })->filter(fn ($e) => $e['absences'] > 0)
-          ->sortByDesc('absences')
-          ->take(5)
-          ->values();
-
-        return view('stats.index', [
-            'totalPresences' => $totalPresences,
-            'totalPresent' => $totalPresent,
-            'totalAbsent' => $totalAbsent,
-            'totalRetard' => $totalRetard,
-            'tauxAbsenteisme' => $tauxAbsenteisme,
-            'tauxPresence' => $tauxPresence,
-            'classes' => $classes,
-            'elevesAbsences' => $elevesAbsences,
-        ]);
+        return view('stats.index', compact(
+            'total', 'presents', 'absents', 'retards',
+            'tauxPresence', 'tauxAbsence',
+            'parClasse', 'topAbsents', 'classes',
+            'classeId', 'du', 'au'
+        ));
     }
 }

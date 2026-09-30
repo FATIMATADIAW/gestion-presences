@@ -8,7 +8,22 @@ class Presence extends Model
 {
     protected $table = 'presences';
 
-    protected $fillable = ['statut', 'seance_id', 'eleve_id'];
+    protected $fillable = [
+        'statut',
+        'seance_id',
+        'eleve_id',
+        'justifiee',
+        'motif',
+        'commentaire',
+        'justifiee_le',
+        'alerte_envoyee_le',
+    ];
+
+    protected $casts = [
+        'justifiee' => 'boolean',
+        'justifiee_le' => 'datetime',
+        'alerte_envoyee_le' => 'datetime',
+    ];
 
     public function seance()
     {

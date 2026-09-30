@@ -1,4 +1,4 @@
- <?php
+<?php
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PresenceController;
@@ -6,6 +6,7 @@ use App\Http\Controllers\ClasseController;
 use App\Http\Controllers\EleveController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StatsController;
+use App\Http\Controllers\AbsenceController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -17,22 +18,41 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
 
+    // Séances / Pointage
     Route::get('/presences', [PresenceController::class, 'index'])->name('presences.index');
     Route::get('/presences/creer', [PresenceController::class, 'creer'])->name('presences.creer');
     Route::post('/presences/creer', [PresenceController::class, 'creerEnregistrer'])->name('presences.creerEnregistrer');
+    Route::get('/presences/{seance}/modifier', [PresenceController::class, 'modifier'])->name('presences.modifier');
+    Route::put('/presences/{seance}', [PresenceController::class, 'modifierEnregistrer'])->name('presences.modifierEnregistrer');
     Route::get('/presences/{seance}', [PresenceController::class, 'pointer'])->name('presences.pointer');
     Route::post('/presences/{seance}', [PresenceController::class, 'enregistrer'])->name('presences.enregistrer');
+    Route::delete('/presences/{seance}', [PresenceController::class, 'supprimer'])->name('presences.supprimer');
 
+    // Classes
     Route::get('/classes', [ClasseController::class, 'index'])->name('classes.index');
     Route::get('/classes/creer', [ClasseController::class, 'create'])->name('classes.create');
     Route::post('/classes', [ClasseController::class, 'store'])->name('classes.store');
+    Route::get('/classes/{classe}/modifier', [ClasseController::class, 'edit'])->name('classes.edit');
+    Route::put('/classes/{classe}', [ClasseController::class, 'update'])->name('classes.update');
     Route::delete('/classes/{classe}', [ClasseController::class, 'destroy'])->name('classes.destroy');
 
+    // Élèves
     Route::get('/eleves', [EleveController::class, 'index'])->name('eleves.index');
     Route::get('/eleves/creer', [EleveController::class, 'create'])->name('eleves.create');
     Route::post('/eleves', [EleveController::class, 'store'])->name('eleves.store');
+    Route::get('/eleves/{eleve}/modifier', [EleveController::class, 'edit'])->name('eleves.edit');
+    Route::put('/eleves/{eleve}', [EleveController::class, 'update'])->name('eleves.update');
     Route::delete('/eleves/{eleve}', [EleveController::class, 'destroy'])->name('eleves.destroy');
 
+    // Absences (justifications et alertes parents)
+    Route::get('/absences', [AbsenceController::class, 'index'])->name('absences.index');
+    Route::post('/absences/alertes', [AbsenceController::class, 'envoyerAlertes'])->name('absences.alertes');
+    Route::get('/absences/{id}/justifier', [AbsenceController::class, 'justifier'])->name('absences.justifier');
+    Route::post('/absences/{id}/justifier', [AbsenceController::class, 'enregistrer'])->name('absences.justifier.enregistrer');
+    Route::get('/absences/{id}/alerter', [AbsenceController::class, 'alerter'])->name('absences.alerter');
+    Route::post('/absences/{id}/alerter', [AbsenceController::class, 'envoyerAlerte'])->name('absences.alerter.envoyer');
+
+    // Statistiques
     Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
 
 });

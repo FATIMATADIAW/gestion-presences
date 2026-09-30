@@ -8,7 +8,11 @@ class Eleve extends Model
 {
     protected $table = 'eleves';
 
-    protected $fillable = ['nom', 'prenom', 'matricule', 'date_naissance', 'classe_id'];
+    protected $fillable = [
+        'nom', 'prenom', 'matricule', 'date_naissance', 'classe_id',
+        'parent_nom', 'parent_email', 'parent_telephone',
+        'pere_nom', 'pere_email', 'mere_nom', 'mere_email',
+    ];
 
     public function classe()
     {

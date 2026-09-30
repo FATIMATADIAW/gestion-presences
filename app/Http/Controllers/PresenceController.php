@@ -4,23 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\Seance;
 use App\Models\Presence;
+use App\Models\Classe;
 use Illuminate\Http\Request;
 
 class PresenceController extends Controller
 {
-    // Liste des séances (pour choisir laquelle pointer)
+    // Liste des séances
     public function index()
     {
         $seances = Seance::with('classe')->orderBy('date', 'desc')->get();
         return view('presences.index', compact('seances'));
     }
 
-    // Formulaire de pointage pour une séance donnée
+    // Formulaire de pointage
     public function pointer(Seance $seance)
     {
         $eleves = $seance->classe->eleves()->orderBy('nom')->get();
 
-        // Récupère les présences déjà enregistrées pour cette séance (s'il y en a)
         $presences = Presence::where('seance_id', $seance->id)
             ->pluck('statut', 'eleve_id');
 
@@ -49,7 +49,7 @@ class PresenceController extends Controller
     // Formulaire de création d'une séance
     public function creer()
     {
-        $classes = \App\Models\Classe::orderBy('nom')->get();
+        $classes = Classe::orderBy('nom')->get();
         return view('presences.creer', compact('classes'));
     }
 
@@ -68,10 +68,41 @@ class PresenceController extends Controller
             'heure' => $request->heure,
             'matiere' => $request->matiere,
             'classe_id' => $request->classe_id,
-            'enseignant_id' => 1, // temporaire, en attendant le système de connexion
+            'enseignant_id' => auth()->id(),
         ]);
 
         return redirect()->route('presences.index')
             ->with('success', 'Nouvelle séance créée avec succès.');
+    }
+
+    // Modifier une séance
+    public function modifier(Seance $seance)
+    {
+        $classes = Classe::orderBy('nom')->get();
+        return view('presences.modifier', compact('seance', 'classes'));
+    }
+
+    public function modifierEnregistrer(Request $request, Seance $seance)
+    {
+        $data = $request->validate([
+            'date'      => 'required|date',
+            'heure'     => 'required',
+            'matiere'   => 'required|string|max:50',
+            'classe_id' => 'required|exists:classes,id',
+        ]);
+
+        $seance->update($data);
+
+        return redirect()->route('presences.index')->with('success', 'Séance modifiée.');
+    }
+
+    // Suppression d'une séance (et de ses pointages)
+    public function supprimer(Seance $seance)
+    {
+        Presence::where('seance_id', $seance->id)->delete();
+        $seance->delete();
+
+        return redirect()->route('presences.index')
+            ->with('success', 'Séance supprimée.');
     }
 }
