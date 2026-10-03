@@ -10,6 +10,19 @@
         </a>
     </div>
 
+    <form method="GET" action="{{ route('eleves.index') }}" class="mb-3">
+        <div class="input-group" style="max-width: 400px;">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" name="recherche" value="{{ request('recherche') }}"
+                   class="form-control" placeholder="Rechercher un élève...">
+            @if(request('recherche'))
+                <a href="{{ route('eleves.index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            @endif
+        </div>
+    </form>
+
     <div class="table-card">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -46,7 +59,13 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="text-center text-muted py-4">Aucun élève pour le moment.</td></tr>
+                        <tr><td colspan="5" class="text-center text-muted py-4">
+                            @if(request('recherche'))
+                                Aucun élève trouvé pour « {{ request('recherche') }} ».
+                            @else
+                                Aucun élève pour le moment.
+                            @endif
+                        </td></tr>
                     @endforelse
                 </tbody>
             </table>

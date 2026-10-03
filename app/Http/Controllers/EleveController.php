@@ -11,9 +11,20 @@ use Illuminate\View\View;
 
 class EleveController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $eleves = Eleve::with('classe')->orderBy('nom')->get();
+        $eleves = Eleve::with('classe')
+            ->when($request->filled('recherche'), function ($query) use ($request) {
+                $recherche = $request->input('recherche');
+                $query->where(function ($q) use ($recherche) {
+                    $q->where('nom', 'like', "%{$recherche}%")
+                      ->orWhere('prenom', 'like', "%{$recherche}%")
+                      ->orWhere('matricule', 'like', "%{$recherche}%");
+                });
+            })
+            ->orderBy('nom')
+            ->get();
+
         return view('eleves.index', ['eleves' => $eleves]);
     }
 
