@@ -12,8 +12,13 @@ class AbsenceController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
+
         $absences = Presence::with(['eleve.classe', 'seance'])
             ->where('statut', AlerteAbsences::STATUT_ABSENT)
+            ->when(!$user->isAdmin(), function ($q) use ($user) {
+                $q->whereHas('seance', fn ($s) => $s->where('enseignant_id', $user->id));
+            })
             ->orderByDesc('id')
             ->get();
 
@@ -26,20 +31,35 @@ class AbsenceController extends Controller
         return redirect()->route('absences.index')->with('success', "$n alerte(s) envoyée(s).");
     }
 
+    // Un enseignant ne peut agir que sur les absences de ses propres séances
+    private function presencePermise($id, array $relations)
+    {
+        $presence = Presence::with($relations)->findOrFail($id);
+
+        $seance = $presence->seance;
+        if (!$seance || $seance->enseignant_id !== auth()->id()) {
+            abort(403, 'Cette absence ne concerne pas l\'une de vos séances.');
+        }
+
+        return $presence;
+    }
+
     public function justifier($id)
     {
-        $presence = Presence::with(['eleve', 'seance'])->findOrFail($id);
+        $presence = $this->presencePermise($id, ['eleve', 'seance']);
         return view('absences.justifier', compact('presence'));
     }
 
     public function enregistrer(Request $request, $id)
     {
+        $presence = $this->presencePermise($id, ['seance']);
+
         $data = $request->validate([
             'motif' => 'required|string|max:255',
             'commentaire' => 'nullable|string|max:1000',
         ]);
 
-        Presence::findOrFail($id)->update([
+        $presence->update([
             'justifiee' => true,
             'motif' => $data['motif'],
             'commentaire' => $data['commentaire'] ?? null,
@@ -51,7 +71,7 @@ class AbsenceController extends Controller
 
     public function alerter($id)
     {
-        $presence = Presence::with(['eleve.classe', 'seance'])->findOrFail($id);
+        $presence = $this->presencePermise($id, ['eleve.classe', 'seance']);
         $contacts = $this->contacts($presence->eleve);
 
         return view('absences.alerter', compact('presence', 'contacts'));
@@ -59,7 +79,7 @@ class AbsenceController extends Controller
 
     public function envoyerAlerte(Request $request, $id)
     {
-        $presence = Presence::with(['eleve', 'seance'])->findOrFail($id);
+        $presence = $this->presencePermise($id, ['eleve', 'seance']);
         $contacts = $this->contacts($presence->eleve);
 
         $data = $request->validate([
