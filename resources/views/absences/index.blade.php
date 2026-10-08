@@ -1,55 +1,78 @@
 @extends('layouts.app')
 
-@section('title', 'Séances')
+@section('title', 'Absences')
 
 @section('content')
+    @php $estAdmin = auth()->user()->isAdmin(); @endphp
+
     <div class="page-header">
-        <h1 class="page-title"><span class="bar"></span> Liste des séances</h1>
-        <a class="btn-add" href="{{ route('presences.creer') }}">
-            <i class="bi bi-plus-lg"></i> Nouvelle séance
-        </a>
+        <h1 class="page-title"><span class="bar"></span> Liste des absences</h1>
+        @unless($estAdmin)
+            <form action="{{ route('absences.alertes') }}" method="POST"
+                  onsubmit="return confirm('Envoyer les alertes aux parents ?')">
+                @csrf
+                <button type="submit" class="btn-add">Envoyer les alertes</button>
+            </form>
+        @endunless
     </div>
 
-    <div class="table-card">
+    @if(session('success'))
+        <div class="alert alert-success mt-3">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger mt-3">{{ session('error') }}</div>
+    @endif
+
+    <div class="table-card mt-3">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Heure</th>
-                        <th>Matière</th>
+                        <th>Élève</th>
                         <th>Classe</th>
-                        <th class="text-end">Actions</th>
+                        <th>Séance</th>
+                        <th>Statut</th>
+                        @unless($estAdmin)
+                            <th class="text-end">Actions</th>
+                        @endunless
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($seances as $seance)
+                    @forelse($absences as $absence)
                         <tr>
-                            <td>{{ $seance->date->format('d/m/Y') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($seance->heure)->format('H:i') }}</td>
-                            <td>{{ ucfirst($seance->matiere) }}</td>
-                            <td><span class="badge-classe">{{ $seance->classe->nom ?? '—' }}</span></td>
-                            <td class="text-end">
-                                <div class="d-inline-flex gap-1">
-                                    <a class="btn btn-pointer btn-sm text-white" href="{{ route('presences.pointer', $seance) }}">
-                                        <i class="bi bi-check2-square"></i> Pointer
-                                    </a>
-                                    <a class="btn btn-outline-secondary btn-sm" href="{{ route('presences.modifier', $seance) }}">
-                                        <i class="bi bi-pencil"></i> Modifier
-                                    </a>
-                                    <form action="{{ route('presences.supprimer', $seance) }}" method="POST"
-                                          onsubmit="return confirm('Supprimer cette séance et ses pointages ?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-supprimer btn-sm text-white">
-                                            <i class="bi bi-trash"></i> Supprimer
-                                        </button>
-                                    </form>
-                                </div>
+                            <td>{{ $absence->eleve->nom ?? '—' }} {{ $absence->eleve->prenom ?? '' }}</td>
+                            <td><span class="badge-classe">{{ $absence->eleve->classe->nom ?? '—' }}</span></td>
+                            <td>
+                                @if($absence->seance)
+                                    {{ $absence->seance->date->format('d/m/Y') }} · {{ ucfirst($absence->seance->matiere) }}
+                                @else
+                                    —
+                                @endif
                             </td>
+                            <td>
+                                @if($absence->justifiee)
+                                    <span class="badge bg-success">Justifiée</span>
+                                    <div class="small text-muted">{{ $absence->motif }}</div>
+                                @else
+                                    <span class="badge bg-danger">Non justifiée</span>
+                                @endif
+                                @if($absence->alerte_envoyee_le)
+                                    <div class="small text-muted">Parents alertés</div>
+                                @endif
+                            </td>
+                            @unless($estAdmin)
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1">
+                                        @unless($absence->justifiee)
+                                            <a class="btn btn-pointer btn-sm text-white" href="{{ route('absences.justifier', $absence->id) }}">Justifier</a>
+                                        @endunless
+                                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('absences.alerter', $absence->id) }}">Alerter</a>
+                                    </div>
+                                </td>
+                            @endunless
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="text-center text-muted py-4">Aucune séance pour le moment.</td></tr>
+                        <tr><td colspan="{{ $estAdmin ? 4 : 5 }}" class="text-center text-muted py-4">Aucune absence pour le moment.</td></tr>
                     @endforelse
                 </tbody>
             </table>
