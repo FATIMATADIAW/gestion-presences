@@ -7,6 +7,7 @@ use App\Http\Controllers\EleveController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StatsController;
 use App\Http\Controllers\AbsenceController;
+use App\Http\Controllers\ProfesseurController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -55,6 +56,11 @@ Route::middleware('auth')->group(function () {
         Route::put('/eleves/{eleve}', [EleveController::class, 'update'])->name('eleves.update');
         Route::delete('/eleves/{eleve}', [EleveController::class, 'destroy'])->name('eleves.destroy');
 
+        Route::get('/professeurs', [ProfesseurController::class, 'index'])->name('professeurs.index');
+        Route::get('/professeurs/creer', [ProfesseurController::class, 'create'])->name('professeurs.create');
+        Route::post('/professeurs', [ProfesseurController::class, 'store'])->name('professeurs.store');
+        Route::delete('/professeurs/{user}', [ProfesseurController::class, 'destroy'])->name('professeurs.destroy');
+
         Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
     });
 
@@ -62,4 +68,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/absences', [AbsenceController::class, 'index'])
         ->middleware('role:admin,enseignant')
         ->name('absences.index');
-});
+});                 

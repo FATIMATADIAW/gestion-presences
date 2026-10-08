@@ -331,6 +331,9 @@
                 <a class="nav-item {{ request()->is('eleves*') ? 'active' : '' }}" href="{{ url('/eleves') }}">
                     👥 Élèves
                 </a>
+                <a class="nav-item {{ request()->is('professeurs*') ? 'active' : '' }}" href="{{ route('professeurs.index') }}">
+                    🎓 Professeurs
+                </a>
                 <a class="nav-item {{ request()->is('absences*') ? 'active' : '' }}" href="{{ route('absences.index') }}">
                     📝 Absences
                 </a>
