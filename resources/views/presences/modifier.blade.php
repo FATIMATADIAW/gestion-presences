@@ -3,9 +3,9 @@
 @section('title', 'Modifier la séance')
 
 @section('content')
-    <a href="{{ route('classes.index') }}" class="back-link">
-    <i class="bi bi-arrow-left"></i> Retour à la liste des classes
-   </a>
+    <a href="{{ route('presences.index') }}" class="back-link">
+        <i class="bi bi-arrow-left"></i> Retour à la liste des séances
+    </a>
     <div class="card shadow-sm mt-3">
         <div class="card-body p-4">
             <h1 class="h3 mb-4">Modifier la séance</h1>
