@@ -110,7 +110,7 @@
             text-align: center;
         }
         .btn-logout:hover { background: var(--accent-dark); }
-        .main-content { flex: 1; padding: 2rem 2.4rem; }
+        .main-content { flex: 1; padding: 2rem 2.4rem; min-width: 0; }
 
         /* ===== STYLES COMMUNS DES PAGES (Séances, Classes, Élèves...) ===== */
         .page-header {
@@ -246,9 +246,75 @@
             font-size: 0.9rem;
             margin-right: 0.4rem;
         }
+
+        /* ===== MOBILE : barre du haut + menu qui s'ouvre au clic ===== */
+        .mobile-bar, .sidebar-overlay { display: none; }
+
+        @media (max-width: 768px) {
+            body { display: block; }
+
+            .mobile-bar {
+                display: flex;
+                align-items: center;
+                gap: 0.8rem;
+                position: fixed;
+                top: 0; left: 0; right: 0;
+                height: 56px;
+                padding: 0 1rem;
+                background: var(--sidebar-dark);
+                color: #fff;
+                font-weight: 700;
+                z-index: 1030;
+            }
+            .menu-toggle {
+                background: rgba(255,255,255,0.12);
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                width: 40px; height: 40px;
+                font-size: 1.4rem;
+                line-height: 1;
+                cursor: pointer;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0; left: 0; bottom: 0;
+                width: 250px;
+                z-index: 1050;
+                transform: translateX(-100%);
+                transition: transform .25s ease;
+                overflow-y: auto;
+            }
+            body.menu-open .sidebar { transform: translateX(0); }
+            body.menu-open .sidebar-overlay {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.45);
+                z-index: 1040;
+            }
+
+            .main-content { padding: 4.6rem 1rem 1.5rem; }
+
+            .page-header { flex-wrap: wrap; gap: 0.8rem; }
+            .page-title { font-size: 1.25rem; }
+
+            .table-card thead th,
+            .table-card tbody td { padding: 0.8rem 0.9rem; font-size: 0.9rem; }
+            .table-card .btn-sm { padding: 0.4rem 0.7rem; font-size: 0.8rem; }
+
+            .form-card { padding: 1.2rem; max-width: 100%; }
+        }
     </style>
 </head>
 <body>
+
+    <div class="mobile-bar">
+        <button type="button" class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+        <span>ScolPrésence</span>
+    </div>
+    <div class="sidebar-overlay" id="menuOverlay"></div>
 
     <aside class="sidebar">
         <a class="brand" href="{{ url('/presences') }}"><span class="dot"></span> ScolPrésence</a>
@@ -288,6 +354,20 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        (function () {
+            var toggle = document.getElementById('menuToggle');
+            var overlay = document.getElementById('menuOverlay');
+            if (!toggle || !overlay) return;
+            toggle.addEventListener('click', function () {
+                document.body.classList.toggle('menu-open');
+            });
+            overlay.addEventListener('click', function () {
+                document.body.classList.remove('menu-open');
+            });
+        })();
+    </script>
 
     {{-- Les scripts des pages (graphiques...) doivent se charger APRÈS le HTML --}}
     @stack('scripts')
