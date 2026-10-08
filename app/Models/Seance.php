@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Seance extends Model
 {
-    protected $table = 'seances';
-
-    protected $fillable = ['date', 'heure', 'matiere', 'classe_id', 'enseignant_id'];
+    protected $fillable = [
+        'date',
+        'heure',
+        'matiere',
+        'classe_id',
+    ];
 
     protected $casts = [
         'date' => 'date',
@@ -19,13 +22,8 @@ class Seance extends Model
         return $this->belongsTo(Classe::class);
     }
 
-    public function enseignant()
+    public function pointages()
     {
-        return $this->belongsTo(User::class, 'enseignant_id');
-    }
-
-    public function presences()
-    {
-        return $this->hasMany(Presence::class);
+        return $this->hasMany(Pointage::class);
     }
 }
