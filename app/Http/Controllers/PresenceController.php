@@ -9,16 +9,37 @@ use Illuminate\Http\Request;
 
 class PresenceController extends Controller
 {
+    /**
+     * L'admin accède à toutes les séances ;
+     * un enseignant uniquement aux siennes.
+     */
+    private function autoriser(Seance $seance): void
+    {
+        $user = auth()->user();
+
+        abort_unless(
+            $user->isAdmin() || (int) $seance->enseignant_id === (int) $user->id,
+            403,
+            "Cette séance appartient à un autre enseignant."
+        );
+    }
+
     // Liste des séances
     public function index()
     {
-        $seances = Seance::with('classe')->orderBy('date', 'desc')->get();
+        $seances = Seance::with('classe')
+            ->when(!auth()->user()->isAdmin(), fn ($q) => $q->where('enseignant_id', auth()->id()))
+            ->orderBy('date', 'desc')
+            ->get();
+
         return view('presences.index', compact('seances'));
     }
 
     // Formulaire de pointage
     public function pointer(Seance $seance)
     {
+        $this->autoriser($seance);
+
         $eleves = $seance->classe->eleves()->orderBy('nom')->get();
 
         $presences = Presence::where('seance_id', $seance->id)
@@ -30,6 +51,8 @@ class PresenceController extends Controller
     // Enregistrement des présences
     public function enregistrer(Request $request, Seance $seance)
     {
+        $this->autoriser($seance);
+
         $request->validate([
             'statuts' => 'required|array',
             'statuts.*' => 'in:present,absent,retard',
@@ -78,12 +101,16 @@ class PresenceController extends Controller
     // Modifier une séance
     public function modifier(Seance $seance)
     {
+        $this->autoriser($seance);
+
         $classes = Classe::orderBy('nom')->get();
         return view('presences.modifier', compact('seance', 'classes'));
     }
 
     public function modifierEnregistrer(Request $request, Seance $seance)
     {
+        $this->autoriser($seance);
+
         $data = $request->validate([
             'date'      => 'required|date',
             'heure'     => 'required',
@@ -99,6 +126,8 @@ class PresenceController extends Controller
     // Suppression d'une séance (et de ses pointages)
     public function supprimer(Seance $seance)
     {
+        $this->autoriser($seance);
+
         Presence::where('seance_id', $seance->id)->delete();
         $seance->delete();
 

@@ -12,8 +12,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Connexion / Inscription / Déconnexion
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
@@ -44,13 +47,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/eleves/{eleve}', [EleveController::class, 'update'])->name('eleves.update');
     Route::delete('/eleves/{eleve}', [EleveController::class, 'destroy'])->name('eleves.destroy');
 
-    // Absences (justifications et alertes parents)
+    // Absences : justification et alertes aux parents
     Route::get('/absences', [AbsenceController::class, 'index'])->name('absences.index');
     Route::post('/absences/alertes', [AbsenceController::class, 'envoyerAlertes'])->name('absences.alertes');
     Route::get('/absences/{id}/justifier', [AbsenceController::class, 'justifier'])->name('absences.justifier');
     Route::post('/absences/{id}/justifier', [AbsenceController::class, 'enregistrer'])->name('absences.justifier.enregistrer');
-    Route::get('/absences/{id}/alerter', [AbsenceController::class, 'alerter'])->name('absences.alerter');
-    Route::post('/absences/{id}/alerter', [AbsenceController::class, 'envoyerAlerte'])->name('absences.alerter.envoyer');
 
     // Statistiques
     Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
