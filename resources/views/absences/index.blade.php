@@ -32,9 +32,12 @@
             $reste = \App\Services\AlerteAbsences::DELAI_HEURES - \App\Services\AlerteAbsences::heuresEcoulees($a);
         @endphp
         <tr style="border-bottom:1px solid #e5e7eb;">
-            <td style="padding:10px;">{{ $a->eleve->prenom }} {{ $a->eleve->nom }}</td>
+            <td style="padding:10px;">{{ $a->eleve?->prenom }} {{ $a->eleve?->nom }}</td>
             <td style="padding:10px;">{{ $a->eleve->classe->nom ?? '-' }}</td>
-            <td style="padding:10px;">{{ $a->seance->matiere }} · {{ $a->seance->date->format('d/m/Y') }}</td>
+            <td style="padding:10px;">
+    {{ $a->seance?->matiere }} ·
+    {{ $a->seance?->date ? \Carbon\Carbon::parse($a->seance->date)->format('d/m/Y') : '-' }}
+</td>
             <td style="padding:10px;">
                 @if($st === 'justifiee') Justifiée ({{ $a->motif }})
                 @elseif($st === 'alerte') Parent alerté
