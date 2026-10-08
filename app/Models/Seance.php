@@ -11,6 +11,7 @@ class Seance extends Model
         'heure',
         'matiere',
         'classe_id',
+        'enseignant_id',
     ];
 
     protected $casts = [
@@ -22,8 +23,13 @@ class Seance extends Model
         return $this->belongsTo(Classe::class);
     }
 
-    public function pointages()
+    public function enseignant()
     {
-        return $this->hasMany(Pointage::class);
+        return $this->belongsTo(User::class, 'enseignant_id');
+    }
+
+    public function presences()
+    {
+        return $this->hasMany(Presence::class);
     }
 }
