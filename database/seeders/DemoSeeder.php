@@ -8,11 +8,14 @@ use App\Models\Presence;
 use App\Models\Seance;
 use App\Services\AlerteAbsences;
 use Illuminate\Database\Seeder;
+use App\Models\User;
 
 class DemoSeeder extends Seeder
 {
     public function run(): void
     {
+                // Enseignant de démonstration : le premier compte (admin)
+        $prof = User::first();
         // 1. Classes
         $classes = [];
         foreach ([['1ere Année', 'Licence 1'], ['2eme Année', 'Licence 2'], ['3eme Année', 'Licence 3']] as [$nom, $niveau]) {
@@ -44,6 +47,7 @@ class DemoSeeder extends Seeder
                     'date'      => now()->subDays($joursAvant)->toDateString(),
                 ], [
                     'heure' => '08:00:00',
+                    'enseignant_id' => $prof->id,
                 ]);
 
                 foreach ($classe->eleves()->get() as $i => $eleve) {
