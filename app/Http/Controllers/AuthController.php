@@ -25,7 +25,13 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/presences')->with('success', 'Connexion réussie.');
+
+            // Admin -> statistiques, enseignant -> séances
+            $accueil = Auth::user()->isAdmin()
+                ? route('stats.index')
+                : route('presences.index');
+
+            return redirect()->intended($accueil)->with('success', 'Connexion réussie.');
         }
 
         return back()->withErrors([

@@ -1,70 +1,58 @@
 @extends('layouts.app')
 
+@section('title', 'Séances')
+
 @section('content')
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-    <h2>Absences</h2>
-    <form method="POST" action="{{ route('absences.alertes') }}">
-        @csrf
-        <button type="submit" style="background:var(--accent); color:var(--on-accent); border:0; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600;">
-            Envoyer les alertes maintenant
-        </button>
-    </form>
-</div>
+    <div class="page-header">
+        <h1 class="page-title"><span class="bar"></span> Liste des séances</h1>
+        <a class="btn-add" href="{{ route('presences.creer') }}">
+            <i class="bi bi-plus-lg"></i> Nouvelle séance
+        </a>
+    </div>
 
-@if(session('success'))
-    <div style="background:#e6f4ea; padding:10px 14px; border-radius:8px; margin-bottom:12px;">{{ session('success') }}</div>
-@endif
-
-<table style="width:100%; border-collapse:collapse; background:#fff;">
-    <thead>
-        <tr style="background:var(--primary); color:#fff; text-align:left;">
-            <th style="padding:10px;">Élève</th>
-            <th style="padding:10px;">Classe</th>
-            <th style="padding:10px;">Séance</th>
-            <th style="padding:10px;">Statut</th>
-            <th style="padding:10px;">Action</th>
-        </tr>
-    </thead>
-    <tbody>
-    @forelse($absences as $a)
-        @php
-            $st = \App\Services\AlerteAbsences::statut($a);
-            $reste = \App\Services\AlerteAbsences::DELAI_HEURES - \App\Services\AlerteAbsences::heuresEcoulees($a);
-        @endphp
-        <tr style="border-bottom:1px solid #e5e7eb;">
-            <td style="padding:10px;">{{ $a->eleve?->prenom }} {{ $a->eleve?->nom }}</td>
-            <td style="padding:10px;">{{ $a->eleve->classe->nom ?? '-' }}</td>
-            <td style="padding:10px;">
-    {{ $a->seance?->matiere }} ·
-    {{ $a->seance?->date ? \Carbon\Carbon::parse($a->seance->date)->format('d/m/Y') : '-' }}
-</td>
-            <td style="padding:10px;">
-                @if($st === 'justifiee') Justifiée ({{ $a->motif }})
-                @elseif($st === 'alerte') Parent alerté
-                @elseif($st === 'depasse') Délai dépassé
-                @else Non justifiée (alerte dans {{ max($reste, 0) }} h)
-                @endif
-            </td>
-            <td style="padding:10px;">
-                @if($st !== 'justifiee')
-                    <div style="display:inline-flex; gap:6px;">
-                        <button type="button"
-                                style="background:var(--accent); color:var(--on-accent); border:0; padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:600;"
-                                onclick="window.location.href='{{ route('absences.alerter', $a->id) }}'">
-                            Alerter
-                        </button>
-                        <button type="button"
-                                style="background:var(--primary); color:#fff; border:0; padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:600;"
-                                onclick="window.location.href='{{ route('absences.justifier', $a->id) }}'">
-                            Justifier
-                        </button>
-                    </div>
-                @endif
-            </td>
-        </tr>
-    @empty
-        <tr><td colspan="5" style="padding:16px; text-align:center;">Aucune absence.</td></tr>
-    @endforelse
-    </tbody>
-</table>
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Heure</th>
+                        <th>Matière</th>
+                        <th>Classe</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($seances as $seance)
+                        <tr>
+                            <td>{{ $seance->date->format('d/m/Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($seance->heure)->format('H:i') }}</td>
+                            <td>{{ ucfirst($seance->matiere) }}</td>
+                            <td><span class="badge-classe">{{ $seance->classe->nom ?? '—' }}</span></td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    <a class="btn btn-pointer btn-sm text-white" href="{{ route('presences.pointer', $seance) }}">
+                                        <i class="bi bi-check2-square"></i> Pointer
+                                    </a>
+                                    <a class="btn btn-outline-secondary btn-sm" href="{{ route('presences.modifier', $seance) }}">
+                                        <i class="bi bi-pencil"></i> Modifier
+                                    </a>
+                                    <form action="{{ route('presences.supprimer', $seance) }}" method="POST"
+                                          onsubmit="return confirm('Supprimer cette séance et ses pointages ?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-supprimer btn-sm text-white">
+                                            <i class="bi bi-trash"></i> Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="5" class="text-center text-muted py-4">Aucune séance pour le moment.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 @endsection

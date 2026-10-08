@@ -21,41 +21,45 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
 
-    // Séances / Pointage
-    Route::get('/presences', [PresenceController::class, 'index'])->name('presences.index');
-    Route::get('/presences/creer', [PresenceController::class, 'creer'])->name('presences.creer');
-    Route::post('/presences/creer', [PresenceController::class, 'creerEnregistrer'])->name('presences.creerEnregistrer');
-    Route::get('/presences/{seance}/modifier', [PresenceController::class, 'modifier'])->name('presences.modifier');
-    Route::put('/presences/{seance}', [PresenceController::class, 'modifierEnregistrer'])->name('presences.modifierEnregistrer');
-    Route::get('/presences/{seance}', [PresenceController::class, 'pointer'])->name('presences.pointer');
-    Route::post('/presences/{seance}', [PresenceController::class, 'enregistrer'])->name('presences.enregistrer');
-    Route::delete('/presences/{seance}', [PresenceController::class, 'supprimer'])->name('presences.supprimer');
+    // ENSEIGNANT : séances, appel, justification
+    Route::middleware('role:enseignant')->group(function () {
+        Route::get('/presences', [PresenceController::class, 'index'])->name('presences.index');
+        Route::get('/presences/creer', [PresenceController::class, 'creer'])->name('presences.creer');
+        Route::post('/presences/creer', [PresenceController::class, 'creerEnregistrer'])->name('presences.creerEnregistrer');
+        Route::get('/presences/{seance}/modifier', [PresenceController::class, 'modifier'])->name('presences.modifier');
+        Route::put('/presences/{seance}', [PresenceController::class, 'modifierEnregistrer'])->name('presences.modifierEnregistrer');
+        Route::get('/presences/{seance}', [PresenceController::class, 'pointer'])->name('presences.pointer');
+        Route::post('/presences/{seance}', [PresenceController::class, 'enregistrer'])->name('presences.enregistrer');
+        Route::delete('/presences/{seance}', [PresenceController::class, 'supprimer'])->name('presences.supprimer');
 
-    // Classes
-    Route::get('/classes', [ClasseController::class, 'index'])->name('classes.index');
-    Route::get('/classes/creer', [ClasseController::class, 'create'])->name('classes.create');
-    Route::post('/classes', [ClasseController::class, 'store'])->name('classes.store');
-    Route::get('/classes/{classe}/modifier', [ClasseController::class, 'edit'])->name('classes.edit');
-    Route::put('/classes/{classe}', [ClasseController::class, 'update'])->name('classes.update');
-    Route::delete('/classes/{classe}', [ClasseController::class, 'destroy'])->name('classes.destroy');
+        Route::post('/absences/alertes', [AbsenceController::class, 'envoyerAlertes'])->name('absences.alertes');
+        Route::get('/absences/{id}/justifier', [AbsenceController::class, 'justifier'])->name('absences.justifier');
+        Route::post('/absences/{id}/justifier', [AbsenceController::class, 'enregistrer'])->name('absences.justifier.enregistrer');
+        Route::get('/absences/{id}/alerter', [AbsenceController::class, 'alerter'])->name('absences.alerter');
+        Route::post('/absences/{id}/alerter', [AbsenceController::class, 'envoyerAlerte'])->name('absences.alerter.envoyer');
+    });
 
-    // Élèves
-    Route::get('/eleves', [EleveController::class, 'index'])->name('eleves.index');
-    Route::get('/eleves/creer', [EleveController::class, 'create'])->name('eleves.create');
-    Route::post('/eleves', [EleveController::class, 'store'])->name('eleves.store');
-    Route::get('/eleves/{eleve}/modifier', [EleveController::class, 'edit'])->name('eleves.edit');
-    Route::put('/eleves/{eleve}', [EleveController::class, 'update'])->name('eleves.update');
-    Route::delete('/eleves/{eleve}', [EleveController::class, 'destroy'])->name('eleves.destroy');
+    // ADMIN : gestion et consultation, jamais d'appel
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/classes', [ClasseController::class, 'index'])->name('classes.index');
+        Route::get('/classes/creer', [ClasseController::class, 'create'])->name('classes.create');
+        Route::post('/classes', [ClasseController::class, 'store'])->name('classes.store');
+        Route::get('/classes/{classe}/modifier', [ClasseController::class, 'edit'])->name('classes.edit');
+        Route::put('/classes/{classe}', [ClasseController::class, 'update'])->name('classes.update');
+        Route::delete('/classes/{classe}', [ClasseController::class, 'destroy'])->name('classes.destroy');
 
-    // Absences : justification et alertes aux parents
-    Route::get('/absences', [AbsenceController::class, 'index'])->name('absences.index');
-    Route::post('/absences/alertes', [AbsenceController::class, 'envoyerAlertes'])->name('absences.alertes');
-    Route::get('/absences/{id}/justifier', [AbsenceController::class, 'justifier'])->name('absences.justifier');
-    Route::post('/absences/{id}/justifier', [AbsenceController::class, 'enregistrer'])->name('absences.justifier.enregistrer');
-    Route::get('/absences/{id}/alerter', [AbsenceController::class, 'alerter'])->name('absences.alerter');
-    Route::post('/absences/{id}/alerter', [AbsenceController::class, 'envoyerAlerte'])->name('absences.alerter.envoyer');
+        Route::get('/eleves', [EleveController::class, 'index'])->name('eleves.index');
+        Route::get('/eleves/creer', [EleveController::class, 'create'])->name('eleves.create');
+        Route::post('/eleves', [EleveController::class, 'store'])->name('eleves.store');
+        Route::get('/eleves/{eleve}/modifier', [EleveController::class, 'edit'])->name('eleves.edit');
+        Route::put('/eleves/{eleve}', [EleveController::class, 'update'])->name('eleves.update');
+        Route::delete('/eleves/{eleve}', [EleveController::class, 'destroy'])->name('eleves.destroy');
 
-    // Statistiques
-    Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
+        Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
+    });
 
+    // Liste des absences : admin ET enseignant
+    Route::get('/absences', [AbsenceController::class, 'index'])
+        ->middleware('role:admin,enseignant')
+        ->name('absences.index');
 });

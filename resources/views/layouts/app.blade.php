@@ -317,23 +317,33 @@
     <div class="sidebar-overlay" id="menuOverlay"></div>
 
     <aside class="sidebar">
-        <a class="brand" href="{{ url('/presences') }}"><span class="dot"></span> ScolPrésence</a>
+        <a class="brand" href="{{ auth()->check() && auth()->user()->isAdmin() ? route('stats.index') : route('presences.index') }}"><span class="dot"></span> ScolPrésence</a>
 
-        <a class="nav-item {{ request()->is('presences*') ? 'active' : '' }}" href="{{ url('/presences') }}">
-            📅 Séances
-        </a>
-        <a class="nav-item {{ request()->is('classes*') ? 'active' : '' }}" href="{{ url('/classes') }}">
-            🏫 Classes
-        </a>
-        <a class="nav-item {{ request()->is('eleves*') ? 'active' : '' }}" href="{{ url('/eleves') }}">
-            👥 Élèves
-        </a>
-        <a class="nav-item {{ request()->is('absences*') ? 'active' : '' }}" href="{{ route('absences.index') }}">
-            📝 Absences
-        </a>
-        <a class="nav-item {{ request()->is('stats*') ? 'active' : '' }}" href="{{ route('stats.index') }}">
-            📊 Statistiques
-        </a>
+        @auth
+            @if(auth()->user()->isAdmin())
+                {{-- MENU ADMIN : gestion et consultation --}}
+                <a class="nav-item {{ request()->is('stats*') ? 'active' : '' }}" href="{{ route('stats.index') }}">
+                    📊 Statistiques
+                </a>
+                <a class="nav-item {{ request()->is('classes*') ? 'active' : '' }}" href="{{ url('/classes') }}">
+                    🏫 Classes
+                </a>
+                <a class="nav-item {{ request()->is('eleves*') ? 'active' : '' }}" href="{{ url('/eleves') }}">
+                    👥 Élèves
+                </a>
+                <a class="nav-item {{ request()->is('absences*') ? 'active' : '' }}" href="{{ route('absences.index') }}">
+                    📝 Absences
+                </a>
+            @else
+                {{-- MENU ENSEIGNANT : séances et appel --}}
+                <a class="nav-item {{ request()->is('presences*') ? 'active' : '' }}" href="{{ route('presences.index') }}">
+                    📅 Séances
+                </a>
+                <a class="nav-item {{ request()->is('absences*') ? 'active' : '' }}" href="{{ route('absences.index') }}">
+                    📝 Absences
+                </a>
+            @endif
+        @endauth
 
         <div class="sidebar-footer">
             @auth
