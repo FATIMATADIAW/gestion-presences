@@ -29,6 +29,11 @@
         .btn-login:hover { background: var(--teal-dark); color: #fff; }
         .toggle-pass { cursor: pointer; }
         .lien-teal { color: var(--teal); font-weight: 600; text-decoration: none; }
+
+        @media (max-width: 768px) {
+            body { align-items: flex-start; padding: 12px; }
+            .right { padding: 24px 18px; }
+        }
     </style>
 </head>
 <body>
