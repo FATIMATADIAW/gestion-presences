@@ -52,6 +52,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/absences/alertes', [AbsenceController::class, 'envoyerAlertes'])->name('absences.alertes');
     Route::get('/absences/{id}/justifier', [AbsenceController::class, 'justifier'])->name('absences.justifier');
     Route::post('/absences/{id}/justifier', [AbsenceController::class, 'enregistrer'])->name('absences.justifier.enregistrer');
+    Route::get('/absences/{id}/alerter', [AbsenceController::class, 'alerter'])->name('absences.alerter');
+    Route::post('/absences/{id}/alerter', [AbsenceController::class, 'envoyerAlerte'])->name('absences.alerter.envoyer');
 
     // Statistiques
     Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
