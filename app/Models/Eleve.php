@@ -14,6 +14,26 @@ class Eleve extends Model
         'pere_nom', 'pere_email', 'mere_nom', 'mere_email',
     ];
 
+    protected static function booted()
+    {
+        static::creating(function ($eleve) {
+            $eleve->matricule = static::genererMatricule();
+        });
+    }
+
+    // Génère E2026-001, E2026-002, etc.
+    public static function genererMatricule(): string
+    {
+        $annee = now()->year;
+
+        $dernierNumero = static::where('matricule', 'like', "E{$annee}-%")
+            ->pluck('matricule')
+            ->map(fn ($m) => (int) substr($m, strrpos($m, '-') + 1))
+            ->max() ?? 0;
+
+        return sprintf('E%d-%03d', $annee, $dernierNumero + 1);
+    }
+
     public function classe()
     {
         return $this->belongsTo(Classe::class);

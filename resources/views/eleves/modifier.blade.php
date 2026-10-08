@@ -31,10 +31,8 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="matricule" class="form-label">Matricule</label>
-                    <input type="text" id="matricule" name="matricule" value="{{ old('matricule', $eleve->matricule) }}" required
-                           class="form-control @error('matricule') is-invalid @enderror">
-                    @error('matricule') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <label class="form-label">Matricule</label>
+                    <input type="text" value="{{ $eleve->matricule }}" class="form-control" readonly disabled>
                 </div>
 
                 <div class="mb-4">
