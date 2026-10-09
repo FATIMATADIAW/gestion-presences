@@ -12,7 +12,7 @@
 
     <div class="table-card">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0 table-cards">
                 <thead>
                     <tr>
                         <th>Date</th>
@@ -29,8 +29,8 @@
                             <td>{{ \Carbon\Carbon::parse($seance->heure)->format('H:i') }}</td>
                             <td>{{ ucfirst($seance->matiere) }}</td>
                             <td><span class="badge-classe">{{ $seance->classe->nom ?? '—' }}</span></td>
-                            <td class="text-end">
-                                <div class="d-inline-flex gap-1">
+                            <td class="text-end actions">
+                                <div class="d-inline-flex flex-wrap gap-1">
                                     <a class="btn btn-pointer btn-sm text-white" href="{{ route('presences.pointer', $seance) }}">
                                         <i class="bi bi-check2-square"></i> Pointer
                                     </a>
@@ -49,7 +49,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="text-center text-muted py-4">Aucune séance pour le moment.</td></tr>
+                        <tr><td colspan="5" data-label="" class="text-center text-muted py-4">Aucune séance pour le moment.</td></tr>
                     @endforelse
                 </tbody>
             </table>
