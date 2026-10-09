@@ -111,9 +111,11 @@
                                 @if ($p->motif) · {{ $p->motif }} @endif
                             @else
                                 <span class="text-danger">Non justifiée</span>
+                                @if ($p->seance)
                                 <div class="small text-muted">
-                                    À justifier avant le {{ $p->created_at->copy()->addHours(72)->format('d/m/Y H:i') }}
+                                    À justifier avant le {{ \App\Services\AlerteAbsences::debutSeance($p)->addHours(\App\Services\AlerteAbsences::DELAI_HEURES)->format('d/m/Y H:i') }}
                                 </div>
+                                @endif
                                 <details class="mt-1">
                                     <summary class="text-primary" style="cursor:pointer">Justifier cette absence</summary>
                                     <form method="POST" action="{{ route('espace-eleve.justifier', $p->id) }}" class="mt-2">

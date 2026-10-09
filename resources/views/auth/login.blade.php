@@ -29,6 +29,12 @@
         .btn-login:hover { background: var(--teal-dark); color: #fff; }
         .toggle-pass { cursor: pointer; }
         .lien-teal { color: var(--teal); font-weight: 600; text-decoration: none; }
+
+        .role-choice { display: flex; gap: 8px; margin-bottom: 18px; }
+        .role-choice input { display: none; }
+        .role-choice label { flex: 1; text-align: center; padding: 10px 4px; border: 1px solid #e2e8f0;
+                             border-radius: 10px; cursor: pointer; font-size: .85rem; font-weight: 500; background: #f1f5f9; }
+        .role-choice input:checked + label { background: var(--teal); color: #fff; border-color: var(--teal); }
     </style>
 </head>
 <body>
@@ -50,7 +56,7 @@
             <div class="text-center mb-4">
                 <i class="bi bi-mortarboard-fill fs-1" style="color: var(--teal)"></i>
                 <h4 class="fw-bold mt-2">Connexion à votre compte</h4>
-                <p class="text-muted small">Entrez vos identifiants pour accéder à votre espace</p>
+                <p class="text-muted small">Choisissez votre profil puis entrez vos identifiants</p>
             </div>
 
             @if(session('error'))
@@ -64,6 +70,20 @@
 
             <form action="{{ route('login.submit') }}" method="POST">
                 @csrf
+
+                <div class="role-choice">
+                    <input type="radio" name="role" id="role-enseignant" value="enseignant"
+                           {{ old('role', 'enseignant') === 'enseignant' ? 'checked' : '' }}>
+                    <label for="role-enseignant"><i class="bi bi-person-workspace"></i> Professeur</label>
+
+                    <input type="radio" name="role" id="role-admin" value="admin"
+                           {{ old('role') === 'admin' ? 'checked' : '' }}>
+                    <label for="role-admin"><i class="bi bi-shield-lock"></i> Admin</label>
+
+                    <input type="radio" name="role" id="role-eleve" value="eleve"
+                           {{ old('role') === 'eleve' ? 'checked' : '' }}>
+                    <label for="role-eleve"><i class="bi bi-mortarboard"></i> Élève</label>
+                </div>
 
                 <div class="input-group mb-3">
                     <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>

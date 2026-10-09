@@ -21,12 +21,33 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
+            'role' => 'required|in:enseignant,admin,eleve',
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+        $role = $credentials['role'];
+        unset($credentials['role']);
 
+        if (Auth::attempt($credentials)) {
             $user = Auth::user();
+
+            // Le rôle choisi doit correspondre à celui du compte
+            if ($user->role !== $role) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                $libelle = match ($role) {
+                    'enseignant' => 'professeur',
+                    'admin' => 'admin',
+                    'eleve' => 'élève',
+                };
+
+                return back()->withErrors([
+                    'role' => "Ce compte n'est pas un compte $libelle.",
+                ])->onlyInput('email', 'role');
+            }
+
+            $request->session()->regenerate();
 
             // Élève -> son espace
             if ($user->role === 'eleve') {
@@ -43,7 +64,7 @@ class AuthController extends Controller
 
         return back()->withErrors([
             'email' => 'Identifiants incorrects.',
-        ])->onlyInput('email');
+        ])->onlyInput('email', 'role');
     }
 
     public function showRegister(): View
