@@ -1,0 +1,138 @@
+[1mdiff --git a/resources/views/auth/login.blade.php b/resources/views/auth/login.blade.php[m
+[1mindex 35ee2f9..c23c575 100644[m
+[1m--- a/resources/views/auth/login.blade.php[m
+[1m+++ b/resources/views/auth/login.blade.php[m
+[36m@@ -16,7 +16,6 @@[m
+         .login-card { max-width: 950px; width: 100%; background: #fff; border-radius: 20px; overflow: hidden;[m
+                       box-shadow: 0 20px 50px rgba(0,0,0,.1); }[m
+ [m
+[31m-        /* ---------- Panneau vert (ordinateur / tablette) ---------- */[m
+         .left { background: linear-gradient(135deg, var(--teal) 0%, var(--teal-deep) 100%); color: #fff;[m
+                 display: flex; align-items: center; justify-content: center; padding: 40px; position: relative; min-height: 440px; }[m
+         .left::before { content:''; position:absolute; width:240px; height:240px; border-radius:50%;[m
+[36m@@ -26,13 +25,11 @@[m
+         .left-content { position: relative; z-index: 1; text-align: center; }[m
+         .left-content i { font-size: 3.5rem; margin-bottom: 16px; }[m
+ [m
+[31m-        /* ---------- Bandeau vert (mobile uniquement) ---------- */[m
+         .mobile-brand { background: linear-gradient(135deg, var(--teal) 0%, var(--teal-deep) 100%); color: #fff;[m
+                         padding: 22px 16px; text-align: center; }[m
+         .mobile-brand i { font-size: 2rem; }[m
+         .mobile-brand h4 { margin: 6px 0 0; font-size: 1.25rem; }[m
+ [m
+[31m-        /* ---------- Formulaire ---------- */[m
+         .right { padding: 45px 40px; }[m
+         .input-group-text { background: #f1f5f9; border: 1px solid #e2e8f0; color: var(--teal); }[m
+         .form-control { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 11px; }[m
+[36m@@ -42,9 +39,7 @@[m
+         .toggle-pass { cursor: pointer; }[m
+         .lien-teal { color: var(--teal); font-weight: 600; text-decoration: none; }[m
+ [m
+[31m-        /* ---------- Choix du rôle ---------- */[m
+         .role-choice { display: flex; gap: 8px; margin-bottom: 18px; }[m
+[31m-        /* masqué visuellement mais toujours accessible au clavier */[m
+         .role-choice input { position: absolute; opacity: 0; pointer-events: none; }[m
+         .role-choice label { flex: 1; text-align: center; padding: 10px 4px; border: 1px solid #e2e8f0;[m
+                              border-radius: 10px; cursor: pointer; font-size: .85rem; font-weight: 500; background: #f1f5f9; }[m
+[36m@@ -52,37 +47,26 @@[m
+         .role-choice input:checked + label { background: var(--teal); color: #fff; border-color: var(--teal); }[m
+         .role-choice input:focus-visible + label { outline: 3px solid rgba(33,122,95,.4); outline-offset: 2px; }[m
+ [m
+[31m-        /* =========================================================[m
+[31m-           RESPONSIVE[m
+[31m-           ========================================================= */[m
+[31m-[m
+[31m-        /* Tablette : on réduit les marges */[m
+         @media (max-width: 991.98px) {[m
+             .left { padding: 28px 20px; }[m
+             .right { padding: 36px 28px; }[m
+         }[m
+ [m
+[31m-        /* Mobile : une seule colonne, carte pleine largeur */[m
+         @media (max-width: 767.98px) {[m
+             body { align-items: flex-start; padding: 0; }[m
+             .login-card { border-radius: 0; box-shadow: none; min-height: 100vh; min-height: 100dvh; }[m
+             .right { padding: 24px 18px 32px; }[m
+[31m-[m
+             .role-choice { gap: 6px; }[m
+             .role-choice label { padding: 10px 2px; font-size: .78rem; }[m
+             .role-choice label i { display: block; font-size: 1.1rem; margin-bottom: 2px; }[m
+[31m-[m
+[31m-            /* 16px minimum : évite le zoom automatique sur iPhone */[m
+             .form-control { font-size: 16px; }[m
+         }[m
+ [m
+[31m-        /* Très petits écrans (320 px) */[m
+         @media (max-width: 359.98px) {[m
+             .right { padding: 20px 12px 28px; }[m
+             .role-choice label { font-size: .72rem; }[m
+         }[m
+ [m
+[31m-        /* Téléphone en paysage */[m
+         @media (max-height: 520px) and (orientation: landscape) {[m
+             body { align-items: flex-start; }[m
+         }[m
+[36m@@ -96,7 +80,6 @@[m
+ [m
+ <div class="login-card">[m
+ [m
+[31m-    <!-- Bandeau mobile -->[m
+     <div class="mobile-brand d-md-none">[m
+         <i class="bi bi-mortarboard-fill"></i>[m
+         <h4 class="fw-bold">ScolPrésence</h4>[m
+[36m@@ -104,7 +87,6 @@[m
+ [m
+     <div class="row g-0">[m
+ [m
+[31m-        <!-- Colonne gauche (cachée sur mobile) -->[m
+         <div class="col-md-6 d-none d-md-flex left">[m
+             <div class="left-content">[m
+                 <i class="bi bi-mortarboard-fill"></i>[m
+[36m@@ -113,7 +95,6 @@[m
+             </div>[m
+         </div>[m
+ [m
+[31m-        <!-- Colonne droite -->[m
+         <div class="col-12 col-md-6 right">[m
+             <div class="text-center mb-4">[m
+                 <i class="bi bi-mortarboard-fill fs-1 d-none d-md-inline-block" style="color: var(--teal)"></i>[m
+[36m@@ -150,7 +131,7 @@[m
+                 <div class="input-group mb-3">[m
+                     <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>[m
+                     <input type="email" name="email" value="{{ old('email') }}" class="form-control"[m
+[31m-                           placeholder="Adresse e-mail" autocomplete="email" required>[m
+[32m+[m[32m                           placeholder="Adresse e-mail" autocomplete="username" required>[m
+                 </div>[m
+ [m
+                 <div class="input-group mb-4">[m
+[36m@@ -167,7 +148,7 @@[m
+                 </button>[m
+             </form>[m
+ [m
+[31m-            <div class="text-center mt-4 small">[m
+[32m+[m[32m            <div class="text-center mt-4 small" id="register-link">[m
+                 Pas encore de compte ? <a href="{{ route('register') }}" class="lien-teal">Créer un compte</a>[m
+             </div>[m
+             <div class="text-center mt-2">[m
+[36m@@ -187,6 +168,20 @@[m [mfunction togglePassword() {[m
+         input.type = show ? 'text' : 'password';[m
+         eye.className = show ? 'bi bi-eye-slash' : 'bi bi-eye';[m
+     }[m
+[32m+[m
+[32m+[m[32m    // Pas de lien "Créer un compte" pour l'admin[m
+[32m+[m[32m    const registerLink = document.getElementById('register-link');[m
+[32m+[m
+[32m+[m[32m    function updateRegisterLink() {[m
+[32m+[m[32m        const checked = document.querySelector('input[name="role"]:checked');[m
+[32m+[m[32m        const role = checked ? checked.value : 'enseignant';[m
+[32m+[m[32m        registerLink.style.display = (role === 'admin') ? 'none' : '';[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    document.querySelectorAll('input[name="role"]').forEach(function (r) {[m
+[32m+[m[32m        r.addEventListener('change', updateRegisterLink);[m
+[32m+[m[32m    });[m
+[32m+[m[32m    updateRegisterLink();[m
+ </script>[m
+ </body>[m
+ </html>[m
+\ No newline at end of file[m
