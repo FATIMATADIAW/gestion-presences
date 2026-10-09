@@ -38,8 +38,43 @@
 
     <h4 class="mb-3">Mes présences</h4>
 
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+    @if ($errors->any())
+        <div class="alert alert-danger">{{ $errors->first() }}</div>
+    @endif
+
+    <form method="GET" action="{{ url('/espace-eleve') }}" class="d-flex flex-wrap gap-2 mb-3">
+        <select name="statut" class="form-select" style="max-width:220px">
+            <option value="">Tous les statuts</option>
+            <option value="present" {{ request('statut') === 'present' ? 'selected' : '' }}>Présent</option>
+            <option value="absent" {{ request('statut') === 'absent' ? 'selected' : '' }}>Absent</option>
+            <option value="retard" {{ request('statut') === 'retard' ? 'selected' : '' }}>Retard</option>
+            <option value="non_justifiee" {{ request('statut') === 'non_justifiee' ? 'selected' : '' }}>Absences non justifiées</option>
+        </select>
+
+        <select name="matiere" class="form-select" style="max-width:220px">
+            <option value="">Toutes les matières</option>
+            @foreach ($matieres as $m)
+                <option value="{{ $m }}" {{ request('matiere') === $m ? 'selected' : '' }}>{{ $m }}</option>
+            @endforeach
+        </select>
+
+        <select name="ordre" class="form-select" style="max-width:220px">
+            <option value="recent" {{ request('ordre', 'recent') === 'recent' ? 'selected' : '' }}>Plus récentes d'abord</option>
+            <option value="ancien" {{ request('ordre') === 'ancien' ? 'selected' : '' }}>Plus anciennes d'abord</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary">Filtrer</button>
+        <a href="{{ url('/espace-eleve') }}" class="btn btn-outline-secondary">Réinitialiser</a>
+    </form>
+
     @if ($presences->isEmpty())
-        <div class="alert alert-info">Aucune présence enregistrée pour le moment.</div>
+        <div class="alert alert-info">Aucune présence trouvée.</div>
     @else
     <div class="table-responsive">
         <table class="table table-striped align-middle">
@@ -76,6 +111,18 @@
                                 @if ($p->motif) · {{ $p->motif }} @endif
                             @else
                                 <span class="text-danger">Non justifiée</span>
+                                <div class="small text-muted">
+                                    À justifier avant le {{ $p->created_at->copy()->addHours(72)->format('d/m/Y H:i') }}
+                                </div>
+                                <details class="mt-1">
+                                    <summary class="text-primary" style="cursor:pointer">Justifier cette absence</summary>
+                                    <form method="POST" action="{{ route('espace-eleve.justifier', $p->id) }}" class="mt-2">
+                                        @csrf
+                                        <textarea name="motif" class="form-control mb-2" rows="2"
+                                                  placeholder="Motif (maladie, rendez-vous médical...)" required minlength="5" maxlength="500"></textarea>
+                                        <button type="submit" class="btn btn-sm btn-success">Envoyer</button>
+                                    </form>
+                                </details>
                             @endif
                         @else
                             -

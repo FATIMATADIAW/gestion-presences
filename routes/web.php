@@ -9,6 +9,7 @@ use App\Http\Controllers\StatsController;
 use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\ProfesseurController;
 use App\Http\Controllers\EspaceEleveController;
+use App\Http\Controllers\JustificationEleveController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -67,9 +68,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
     });
 
-    // ÉLÈVE : son propre espace, en lecture seule
+    // ÉLÈVE : son propre espace, consultation et justification de ses absences
     Route::middleware('role:eleve')->group(function () {
         Route::get('/espace-eleve', [EspaceEleveController::class, 'index'])->name('eleve.espace');
+        Route::post('/espace-eleve/presences/{presence}/justifier', [JustificationEleveController::class, 'store'])
+            ->name('espace-eleve.justifier');
     });
 
     // Liste des absences : admin ET enseignant
