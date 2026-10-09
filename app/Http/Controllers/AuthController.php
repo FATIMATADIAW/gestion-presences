@@ -26,8 +26,15 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
+            $user = Auth::user();
+
+            // Élève -> son espace
+            if ($user->role === 'eleve') {
+                return redirect()->route('eleve.espace')->with('success', 'Connexion réussie.');
+            }
+
             // Admin -> statistiques, enseignant -> séances
-            $accueil = Auth::user()->isAdmin()
+            $accueil = $user->isAdmin()
                 ? route('stats.index')
                 : route('presences.index');
 

@@ -317,7 +317,17 @@
     <div class="sidebar-overlay" id="menuOverlay"></div>
 
     <aside class="sidebar">
-        <a class="brand" href="{{ auth()->check() && auth()->user()->isAdmin() ? route('stats.index') : route('presences.index') }}"><span class="dot"></span> ScolPrésence</a>
+        @php
+            $accueilMenu = route('presences.index');
+            if (auth()->check()) {
+                if (auth()->user()->isAdmin()) {
+                    $accueilMenu = route('stats.index');
+                } elseif (auth()->user()->isEleve()) {
+                    $accueilMenu = route('eleve.espace');
+                }
+            }
+        @endphp
+        <a class="brand" href="{{ $accueilMenu }}"><span class="dot"></span> ScolPrésence</a>
 
         @auth
             @if(auth()->user()->isAdmin())
@@ -336,6 +346,11 @@
                 </a>
                 <a class="nav-item {{ request()->is('absences*') ? 'active' : '' }}" href="{{ route('absences.index') }}">
                     📝 Absences
+                </a>
+            @elseif(auth()->user()->isEleve())
+                {{-- MENU ÉLÈVE : son propre espace --}}
+                <a class="nav-item {{ request()->is('espace-eleve*') ? 'active' : '' }}" href="{{ route('eleve.espace') }}">
+                    📋 Mon espace
                 </a>
             @else
                 {{-- MENU ENSEIGNANT : séances et appel --}}

@@ -12,6 +12,7 @@ class Eleve extends Model
         'nom', 'prenom', 'matricule', 'date_naissance', 'classe_id',
         'parent_nom', 'parent_email', 'parent_telephone',
         'pere_nom', 'pere_email', 'mere_nom', 'mere_email',
+        'user_id',
     ];
 
     protected static function booted()
@@ -42,5 +43,10 @@ class Eleve extends Model
     public function presences()
     {
         return $this->hasMany(Presence::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class);
     }
 }

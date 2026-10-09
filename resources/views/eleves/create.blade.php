@@ -47,6 +47,22 @@
             @error('classe_id') <div class="text-danger">{{ $message }}</div> @enderror
         </div>
 
+        <hr class="my-4">
+        <h5 class="mb-3">Accès de l'élève</h5>
+
+        <div class="mb-3">
+            <label class="form-label">Email de connexion</label>
+            <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
+            @error('email') <div class="text-danger">{{ $message }}</div> @enderror
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Mot de passe provisoire</label>
+            <input type="text" name="password" class="form-control" required minlength="8">
+            <small class="text-muted">8 caractères minimum. À communiquer à l'élève.</small>
+            @error('password') <div class="text-danger">{{ $message }}</div> @enderror
+        </div>
+
         <button type="submit" class="btn btn-success">Ajouter l'élève</button>
     </form>
     @endif

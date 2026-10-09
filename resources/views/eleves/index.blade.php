@@ -32,6 +32,7 @@
                         <th>Prénom</th>
                         <th>Matricule</th>
                         <th>Classe</th>
+                        <th>Accès</th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
@@ -42,6 +43,15 @@
                             <td>{{ $eleve->prenom }}</td>
                             <td>{{ $eleve->matricule ?? '—' }}</td>
                             <td><span class="badge-classe">{{ $eleve->classe->nom ?? '—' }}</span></td>
+                            <td>
+                                @if ($eleve->user_id)
+                                    <span class="badge bg-success">Accès actif</span>
+                                @else
+                                    <a class="btn btn-sm btn-outline-success" href="{{ route('eleves.acces', $eleve) }}">
+                                        Créer l'accès
+                                    </a>
+                                @endif
+                            </td>
                             <td class="text-end">
                                 <div class="d-inline-flex gap-1">
                                     <a class="btn btn-outline-secondary btn-sm" href="{{ route('eleves.edit', $eleve) }}">
@@ -59,7 +69,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="text-center text-muted py-4">
+                        <tr><td colspan="6" class="text-center text-muted py-4">
                             @if(request('recherche'))
                                 Aucun élève trouvé pour « {{ request('recherche') }} ».
                             @else

@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StatsController;
 use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\ProfesseurController;
+use App\Http\Controllers\EspaceEleveController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -55,6 +56,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/eleves/{eleve}/modifier', [EleveController::class, 'edit'])->name('eleves.edit');
         Route::put('/eleves/{eleve}', [EleveController::class, 'update'])->name('eleves.update');
         Route::delete('/eleves/{eleve}', [EleveController::class, 'destroy'])->name('eleves.destroy');
+        Route::get('/eleves/{eleve}/acces', [EleveController::class, 'acces'])->name('eleves.acces');
+        Route::post('/eleves/{eleve}/acces', [EleveController::class, 'creerAcces'])->name('eleves.acces.creer');
 
         Route::get('/professeurs', [ProfesseurController::class, 'index'])->name('professeurs.index');
         Route::get('/professeurs/creer', [ProfesseurController::class, 'create'])->name('professeurs.create');
@@ -64,8 +67,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
     });
 
+    // ÉLÈVE : son propre espace, en lecture seule
+    Route::middleware('role:eleve')->group(function () {
+        Route::get('/espace-eleve', [EspaceEleveController::class, 'index'])->name('eleve.espace');
+    });
+
     // Liste des absences : admin ET enseignant
     Route::get('/absences', [AbsenceController::class, 'index'])
         ->middleware('role:admin,enseignant')
         ->name('absences.index');
-});                 
+});

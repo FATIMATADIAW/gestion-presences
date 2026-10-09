@@ -27,8 +27,23 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    public function isEnseignant(): bool
+    {
+        return $this->role === 'enseignant';
+    }
+
+    public function isEleve(): bool
+    {
+        return $this->role === 'eleve';
+    }
+
     public function seances()
     {
         return $this->hasMany(Seance::class, 'enseignant_id');
+    }
+
+    public function eleve()
+    {
+        return $this->hasOne(Eleve::class);
     }
 }
