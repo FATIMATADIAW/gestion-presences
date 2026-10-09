@@ -304,6 +304,10 @@
             .table-card tbody td { padding: 0.8rem 0.9rem; font-size: 0.9rem; }
             .table-card .btn-sm { padding: 0.4rem 0.7rem; font-size: 0.8rem; }
 
+            /* Les cartes se détachent du fond gris */
+            .table-card { background: transparent; box-shadow: none; border-radius: 0; }
+            .table-card tbody tr:hover { background: #fff; }
+
             .form-card { padding: 1.2rem; max-width: 100%; }
         }
     </style>
@@ -391,13 +395,3 @@
             toggle.addEventListener('click', function () {
                 document.body.classList.toggle('menu-open');
             });
-            overlay.addEventListener('click', function () {
-                document.body.classList.remove('menu-open');
-            });
-        })();
-    </script>
-
-    {{-- Les scripts des pages (graphiques...) doivent se charger APRÈS le HTML --}}
-    @stack('scripts')
-</body>
-</html>

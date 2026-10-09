@@ -25,7 +25,7 @@
 
     <div class="table-card">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0 table-cards">
                 <thead>
                     <tr>
                         <th>Nom</th>
@@ -52,8 +52,8 @@
                                     </a>
                                 @endif
                             </td>
-                            <td class="text-end">
-                                <div class="d-inline-flex gap-1">
+                            <td class="text-end actions">
+                                <div class="d-inline-flex flex-wrap gap-1">
                                     <a class="btn btn-outline-secondary btn-sm" href="{{ route('eleves.edit', $eleve) }}">
                                         <i class="bi bi-pencil"></i> Modifier
                                     </a>
@@ -69,7 +69,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="text-center text-muted py-4">
+                    <tr><td colspan="6" data-label="" class="text-center text-muted py-4">
                             @if(request('recherche'))
                                 Aucun élève trouvé pour « {{ request('recherche') }} ».
                             @else
